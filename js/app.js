@@ -37,8 +37,17 @@ var dirs= [
   [-1,0]  //w
 ];
 
+// Colors provided as rgba arrays (for easy manipulation)
+var colorPalette = {
+  0 : [0, 0, 0, 0],
+  1 : [255, 0, 0, 1],
+  2 : [0, 255, 0, 1],
+  3 : [0, 0, 255, 1]
+};
 
-
+var colorArrayToRGBA = function (rgba) {
+  return 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+rgba[3]+')';
+};
 
 var setCellValue = function(x,y,val){
   grid[y][x] = val;
@@ -84,7 +93,7 @@ var clear = function() {
 };
 
 var render = function(pixels){
-  var x,y,i,ii;
+  var x,y,i,ii,rgba;
   clear();
   for (i=0; i<pixels.length; i++) {
     for (ii=0; ii<pixels[i].length; ii++) {
@@ -95,14 +104,9 @@ var render = function(pixels){
       }
       context.beginPath();
       // Pick color
-      if (pixels[i][ii] === 1) {
-        context.fillStyle = 'red';
-      }
-      if (pixels[i][ii] === 2) {
-        context.fillStyle = 'green';
-      }
-      if (pixels[i][ii] === 3) {
-        context.fillStyle = 'blue';
+      if (pixels[i][ii] in colorPalette) {
+        rgba = colorPalette[pixels[i][ii]];
+        context.fillStyle = colorArrayToRGBA(rgba);
       }
       context.rect(x, y, pixel, pixel);
       context.fill();
