@@ -1,7 +1,7 @@
 {
   "name": "refresher.js",
   "main": "refresher.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/evitolins/refresher.js",
   "authors": [
     "Eriks Vitolins <evitolins@gmail.com>"
@@ -25,14 +25,13 @@
     "test",
     "tests"
   ],
-  "_release": "1.0.0",
+  "_release": "1.0.1",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.0",
-    "commit": "e42cc6b9ed76288b22eabcadff6951536f263eb2"
+    "tag": "v1.0.1",
+    "commit": "ecf633d51934b784f2734dce5784d4e2619f2177"
   },
   "_source": "git://github.com/evitolins/refresher.js.git",
   "_target": "~1.0.0",
-  "_originalSource": "refresher.js",
-  "_direct": true
+  "_originalSource": "refresher.js"
 }
