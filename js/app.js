@@ -15,6 +15,11 @@ browser: true, devel: true, plusplus: true, unparam: true, todo: true, vars: tru
 // 
 
 var refresh = new Refresher();
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+var pixel = 30;
+var tailMaxLength = 10;
+var freq = 50;
 
 var grid = [
   [0,0,3,0,0,0,0,0,0,0],
@@ -83,10 +88,6 @@ var getValidDirs = function (x, y){
 };
 
 //Canvas Renderer
-var canvas = document.getElementById('canvas');
-var context = canvas.getContext('2d');
-var pixel = 30;
-
 var clear = function() {
   context.clearRect ( 0 , 0 , canvas.width , canvas.height );
 };
@@ -118,9 +119,6 @@ var resetPosition = function (pos) {
   //Reset given position
   grid[pos[1]][pos[0]] = 0;
 };
-
-var tailMaxLength = 10;
-var speed = 1000;
 
 // This example randomly chooses direction per choice
 var snake_run = function (position, direction, random) {
@@ -182,7 +180,7 @@ var snake_run = function (position, direction, random) {
     }
   };
   
-  refresh.setFreq(1/speed);
+  refresh.setFreq(freq);
   refresh.setCallback(next);
   refresh.start();
 };
@@ -219,6 +217,7 @@ btn2.addEventListener('click', function(){init();});
 
 var input_tail = document.getElementById('tail');
 input_tail.addEventListener('change', function(){tailMaxLength = parseInt(this.value, 10);clear();});
-var input_speed = document.getElementById('tail');
+var input_freq = document.getElementById('freq');
+input_freq.addEventListener('change', function(){freq = parseInt(this.value, 10);});
 
 init();
