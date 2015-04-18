@@ -14,6 +14,8 @@ browser: true, devel: true, plusplus: true, unparam: true, todo: true, vars: tru
 // - if no move is available, quit
 // 
 
+require(["bower_components/refresher.js/refresher.js"], function(Refresher) {
+
 var refresh = new Refresher();
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
@@ -58,6 +60,7 @@ var getCellValue = function (x, y) {
   }
   return grid[y][x];
 };
+
 
 // Validate Proposed X & Y coords
 var getValidDirs = function (x, y){
@@ -212,8 +215,10 @@ var btn2 = document.getElementById('reset');
 btn2.addEventListener('click', function(){init();});
 
 var input_tail = document.getElementById('tail');
-input_tail.addEventListener('change', function(){tailMaxLength = parseInt(this.value, 10);clear();});
+input_tail.addEventListener('change', function(){tailMaxLength = parseInt(this.value, 10); init();});
 var input_freq = document.getElementById('freq');
 input_freq.addEventListener('change', function(){freq = parseInt(this.value, 10);});
 
 init();
+
+});
