@@ -19,7 +19,7 @@ var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 var pixel = 30;
 var tailMaxLength = 10;
-var freq = 50;
+var freq = 10;
 
 var grid = [
   [0,0,3,0,0,0,0,0,0,0],
@@ -46,7 +46,8 @@ var colorPalette = {
   0 : [0, 0, 0, 0],
   1 : [255, 0, 0, 1],
   2 : [0, 255, 0, 1],
-  3 : [0, 0, 255, 1]
+  3 : [0, 0, 255, 1],
+  4 : [255, 0, 255, 1]
 };
 
 var colorArrayToRGBA = function (rgba) {
@@ -165,7 +166,7 @@ var snake_run = function (position, direction, random) {
       resetPosition(snaketail.pop());
     }
     
-    setCellValue(pos[0],pos[1],1);
+    setCellValue(pos[0], pos[1], 4);
     
     render(grid);
     i++;
