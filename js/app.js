@@ -110,7 +110,7 @@ var render = function (pixels) {
         rgba = colorPalette[pixels[i][ii]];
         context.fillStyle = colorArrayToRGBA(rgba);
       }
-      context.rect(x, y, pixel, pixel);
+      context.rect(x+1, y+1, pixel-2, pixel-2);
       context.fill();
     }
   }
