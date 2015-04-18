@@ -16,19 +16,18 @@ browser: true, devel: true, plusplus: true, unparam: true, todo: true, vars: tru
 
 var refresh = new Refresher();
 
-var grid = 
-    [
-      [0,0,3,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,2,0,0],
-      [0,0,0,0,0,0,0,0,0,3],
-      [0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,3,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0]
-    ];
+var grid = [
+  [0,0,3,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,2,0,0],
+  [0,0,0,0,0,0,0,0,0,3],
+  [0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,2,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,3,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0]
+];
 
 var dirs= [
   [0,-1], //n
@@ -49,11 +48,11 @@ var colorArrayToRGBA = function (rgba) {
   return 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+rgba[3]+')';
 };
 
-var setCellValue = function(x,y,val){
+var setCellValue = function (x, y, val) {
   grid[y][x] = val;
 };
 
-var getCellValue = function(x,y){
+var getCellValue = function (x, y) {
   if (grid[y] === undefined) return undefined;
   if (grid[y][x] === undefined) return undefined;
   return grid[y][x];
@@ -92,7 +91,7 @@ var clear = function() {
   context.clearRect ( 0 , 0 , canvas.width , canvas.height );
 };
 
-var render = function(pixels){
+var render = function (pixels) {
   var x,y,i,ii,rgba;
   clear();
   for (i=0; i<pixels.length; i++) {
@@ -103,7 +102,6 @@ var render = function(pixels){
         continue;
       }
       context.beginPath();
-      // Pick color
       if (pixels[i][ii] in colorPalette) {
         rgba = colorPalette[pixels[i][ii]];
         context.fillStyle = colorArrayToRGBA(rgba);
@@ -115,7 +113,7 @@ var render = function(pixels){
 };
 
 
-var resetPosition = function(pos){
+var resetPosition = function (pos) {
   if (Object.prototype.toString.call( pos ) !== '[object Array]' ) return;
   //Reset given position
   grid[pos[1]][pos[0]] = 0;
@@ -190,7 +188,7 @@ var snake_run = function (position, direction, random) {
 };
 
 
-var init = function(){
+var init = function () {
   var randomX = Math.floor(Math.random() * 10);
   var randomY = Math.floor(Math.random() * 10);
   grid = 
