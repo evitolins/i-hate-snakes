@@ -18,21 +18,23 @@ var refresh = new Refresher();
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 var pixel = 30;
-var tailMaxLength = 10;
-var freq = 10;
 
+// Defaults
+var tailMaxLength = 4;
+var freq = 10;
 var grid = [
   [0,0,3,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,2,0,0],
   [0,0,0,0,0,0,0,0,0,3],
-  [0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,2,3],
   [0,0,0,2,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,3,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0]
+  [0,0,0,0,0,0,0,0,0,1]
 ];
+var snaketail = [];
 
 var dirs= [
   [0,-1], //n
@@ -126,10 +128,8 @@ var snake_run = function (position, direction, random) {
   var pos = position;
   var dir = direction;
   var v,i;
-  var da = 0; //direction attempts
   var tries = 10000;
   var lastdir = dir;
-  var snaketail = [];
   
   var x = pos[0];
   var y = pos[1];
@@ -203,6 +203,8 @@ var init = function () {
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,1]
     ];
+  snaketail = [];
+
   render(grid);
   snake_run([randomX,randomY], 0, false);
 };
