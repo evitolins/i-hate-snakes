@@ -61,8 +61,12 @@ var setCellValue = function (x, y, val) {
 };
 
 var getCellValue = function (x, y) {
-  if (grid[y] === undefined) return undefined;
-  if (grid[y][x] === undefined) return undefined;
+  if (grid[y] === undefined) {
+    return undefined;
+  }
+  if (grid[y][x] === undefined) {
+    return undefined;
+  }
   return grid[y][x];
 };
 
@@ -72,19 +76,19 @@ var getValidDirs = function (x, y){
   var yMax = grid.length;
   var dirs = [];
   // Validate N
-  if (y-1 >= 0 && getCellValue(x, y-1) === 0){
+  if (y-1 >= 0 && getCellValue(x, y-1) === 0) {
     dirs.push(0);
   }
   // Validate E
-  if (x+1 < xMax && getCellValue(x+1,y) === 0){
+  if (x+1 < xMax && getCellValue(x+1,y) === 0) {
     dirs.push(1);
   }
   // Validate S
-  if (y+1 < yMax && getCellValue(x,y+1) === 0){
+  if (y+1 < yMax && getCellValue(x,y+1) === 0) {
     dirs.push(2);
   }
   // Validate W
-  if (x-1 >= 0 && getCellValue(x-1,y) === 0){
+  if (x-1 >= 0 && getCellValue(x-1,y) === 0) {
     dirs.push(3);
   }
   return dirs;
