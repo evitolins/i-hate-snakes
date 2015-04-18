@@ -1,0 +1,26 @@
+{
+  "name": "i-hate-snakes",
+  "version": "0.0.0",
+  "homepage": "https://github.com/evitolins/i-hate-snakes",
+  "authors": [
+    "Eriks Vitolins <evitolins@gmail.com>"
+  ],
+  "description": "Experiments with HTML5 canvas, based on the classic snake game",
+  "main": "index.html",
+  "keywords": [
+    "html5",
+    "canvas",
+    "game"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "refresher.js": "~1.0.0"
+  }
+}

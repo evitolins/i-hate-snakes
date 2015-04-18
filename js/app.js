@@ -1,0 +1,222 @@
+/*jslint
+browser: true, devel: true, plusplus: true, unparam: true, todo: true, vars: true, white: true, nomen: true
+*/
+/*global RGBrefresher */
+ 
+//
+// Snake Experiment
+// ============================================================================
+// 
+// Rules
+// ----------------------------------------------------------------------------
+// - continue in the same direction, until something obstructs the path
+// - if an obstruction is found, try next direction clockwise
+// - if no move is available, quit
+// 
+
+var refresh = new Refresher();
+
+var grid = 
+    [
+      [0,0,3,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,2,0,0],
+      [0,0,0,0,0,0,0,0,0,3],
+      [0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,2,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,3,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0]
+    ];
+
+var dirs= [
+  [0,-1], //n
+  [1,0],  //e
+  [0,1],  //s
+  [-1,0]  //w
+];
+
+
+
+
+var setCellValue = function(x,y,val){
+  grid[y][x] = val;
+};
+
+var getCellValue = function(x,y){
+  if (grid[y] === undefined) return undefined;
+  if (grid[y][x] === undefined) return undefined;
+  return grid[y][x];
+};
+
+// Validate Proposed X & Y coords
+var getValidDirs = function (x, y){
+  var xMax = grid[0].length;
+  var yMax = grid.length;
+  var dirs = [];
+  // Validate N
+  if (y-1 >= 0 && getCellValue(x, y-1) === 0){
+    dirs.push(0);
+  }
+  // Validate E
+  if (x+1 < xMax && getCellValue(x+1,y) === 0){
+    dirs.push(1);
+  }
+  // Validate S
+  if (y+1 < yMax && getCellValue(x,y+1) === 0){
+    dirs.push(2);
+  }
+  // Validate W
+  if (x-1 >= 0 && getCellValue(x-1,y) === 0){
+    dirs.push(3);
+  }
+  return dirs;
+};
+
+//Canvas Renderer
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+var pixel = 30;
+
+var clear = function() {
+  context.clearRect ( 0 , 0 , canvas.width , canvas.height );
+};
+
+var render = function(pixels){
+  var x,y,i,ii;
+  clear();
+  for (i=0; i<pixels.length; i++) {
+    for (ii=0; ii<pixels[i].length; ii++) {
+      x = ii * pixel;
+      y = i * pixel;
+      if (!pixels[i][ii]) {
+        continue;
+      }
+      context.beginPath();
+      // Pick color
+      if (pixels[i][ii] === 1) {
+        context.fillStyle = 'red';
+      }
+      if (pixels[i][ii] === 2) {
+        context.fillStyle = 'green';
+      }
+      if (pixels[i][ii] === 3) {
+        context.fillStyle = 'blue';
+      }
+      context.rect(x, y, pixel, pixel);
+      context.fill();
+    }
+  }
+};
+
+
+var resetPosition = function(pos){
+  if (Object.prototype.toString.call( pos ) !== '[object Array]' ) return;
+  //Reset given position
+  grid[pos[1]][pos[0]] = 0;
+};
+
+var tailMaxLength = 10;
+var speed = 1000;
+
+// This example randomly chooses direction per choice
+var snake_run = function (position, direction, random) {
+  var pos = position;
+  var dir = direction;
+  var v,i;
+  var da = 0; //direction attempts
+  var tries = 10000;
+  var lastdir = dir;
+  var snaketail = [];
+  
+  var x = pos[0];
+  var y = pos[1];
+  var validDirs = getValidDirs(x, y);
+
+  i = 0;
+  var step = function () {
+    x = pos[0];
+    y = pos[1];
+    validDirs = getValidDirs(x, y);
+    
+    // Quit
+    if (!validDirs.length){
+      return;
+    }
+    // Maintain course
+    if (validDirs.indexOf(lastdir) >= 0 && !random) {
+      dir = lastdir;
+    }
+    // Choose new direction
+    else {
+      dir = validDirs[Math.floor(Math.random() * validDirs.length)];
+    }
+    lastdir = dir;
+
+    pos = [
+      x + dirs[dir][0],
+      y + dirs[dir][1]
+    ];
+    
+    // Limit Tail Length
+    snaketail.unshift(pos);
+    if (snaketail.length > tailMaxLength) {
+      resetPosition(snaketail.pop());
+    }
+    
+    setCellValue(pos[0],pos[1],1);
+    
+    render(grid);
+    i++;
+  };
+  
+  var next = function () {
+    if(i <= tries && validDirs.length){
+      step();
+    } else {
+      console.log("finished");
+      refresh.stop();
+    }
+  };
+  
+  refresh.setFreq(1/speed);
+  refresh.setCallback(next);
+  refresh.start();
+};
+
+
+var init = function(){
+  var randomX = Math.floor(Math.random() * 10);
+  var randomY = Math.floor(Math.random() * 10);
+  grid = 
+    [
+      [0,0,3,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,2,0,0],
+      [0,0,0,0,0,0,0,0,0,3],
+      [0,0,0,0,0,0,0,0,2,3],
+      [0,0,0,2,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,3,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,1]
+    ];
+  render(grid);
+  snake_run([randomX,randomY], 0, false);
+};
+
+
+// Bind Button
+var btn = document.getElementById('play');
+btn.addEventListener('click', function(){refresh.start();});
+var btn1 = document.getElementById('pause');
+btn1.addEventListener('click', function(){refresh.reset();});
+var btn2 = document.getElementById('reset');
+btn2.addEventListener('click', function(){init();});
+
+var input_tail = document.getElementById('tail');
+input_tail.addEventListener('change', function(){tailMaxLength = parseInt(this.value, 10);clear();});
+var input_speed = document.getElementById('tail');
+
+init();
