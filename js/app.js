@@ -14,7 +14,7 @@ browser: true, devel: true, plusplus: true, unparam: true, todo: true, vars: tru
 // - if no move is available, quit
 // 
 
-require(["bower_components/refresher.js/refresher.js"], function(Refresher) {
+require(["bower_components/refresher.js/refresher.js", "Grid2D", "Snake"], function(Refresher, Grid2D, Snake) {
 
 var refresh = new Refresher();
 var canvas = document.getElementById('canvas');
@@ -23,8 +23,11 @@ var pixel = 30;
 
 // Defaults
 var tailMaxLength = 4;
-var freq = 10;
-var grid = [];
+var freq = 2000;
+var width = 10;
+var height = 10;
+var grid = new Grid2D(width, height, 0);
+var snake = new Snake();
 var snaketail = [];
 
 var dirs= [
@@ -47,42 +50,29 @@ var colorArrayToRGBA = function (rgba) {
   return 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+rgba[3]+')';
 };
 
-var setCellValue = function (x, y, val) {
-  grid[y][x] = val;
-};
-
-var getCellValue = function (x, y) {
-  if (grid[y] === undefined) {
-    return undefined;
-  }
-  if (grid[y][x] === undefined) {
-    return undefined;
-  }
-  return grid[y][x];
-};
-
 
 // Validate Proposed X & Y coords
 var getValidDirs = function (x, y){
-  var xMax = grid[0].length;
-  var yMax = grid.length;
+  var xMax = width;
+  var yMax = height;
   var dirs = [];
   // Validate N
-  if (y-1 >= 0 && getCellValue(x, y-1) === 0) {
+  if (y-1 >= 0 && grid.getCell(x, y-1) === 0) {
     dirs.push(0);
   }
   // Validate E
-  if (x+1 < xMax && getCellValue(x+1,y) === 0) {
+  if (x+1 < xMax && grid.getCell(x+1,y) === 0) {
     dirs.push(1);
   }
   // Validate S
-  if (y+1 < yMax && getCellValue(x,y+1) === 0) {
+  if (y+1 < yMax && grid.getCell(x,y+1) === 0) {
     dirs.push(2);
   }
   // Validate W
-  if (x-1 >= 0 && getCellValue(x-1,y) === 0) {
+  if (x-1 >= 0 && grid.getCell(x-1,y) === 0) {
     dirs.push(3);
   }
+  console.log("dirs", dirs);
   return dirs;
 };
 
@@ -116,7 +106,7 @@ var render = function (pixels) {
 var resetPosition = function (pos) {
   if (Object.prototype.toString.call( pos ) !== '[object Array]' ) return;
   //Reset given position
-  grid[pos[1]][pos[0]] = 0;
+  grid.setCell(pos[1], pos[0], 0);
 };
 
 // This example randomly chooses direction per choice
@@ -155,16 +145,18 @@ var snake_run = function (position, direction, random) {
       x + dirs[dir][0],
       y + dirs[dir][1]
     ];
-    
+
+    console.log('pos', x, y, 'pos2', pos[0], pos[1]);
+
     // Limit Tail Length
     snaketail.unshift(pos);
     if (snaketail.length > tailMaxLength) {
       resetPosition(snaketail.pop());
     }
     
-    setCellValue(pos[0], pos[1], 4);
+    grid.setCell(pos[1], pos[0], 4);
     
-    render(grid);
+    render(grid.getGrid());
     i++;
   };
   
@@ -186,8 +178,7 @@ var snake_run = function (position, direction, random) {
 var init = function () {
   var randomX = Math.floor(Math.random() * 10);
   var randomY = Math.floor(Math.random() * 10);
-  grid = 
-    [
+  grid.setGrid([
       [0,0,3,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,2,0,0],
@@ -198,10 +189,10 @@ var init = function () {
       [0,0,0,0,3,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,1]
-    ];
+    ]);
   snaketail = [];
 
-  render(grid);
+  render(grid.getGrid());
   snake_run([randomX,randomY], 0, false);
 };
 
