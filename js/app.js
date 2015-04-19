@@ -12,10 +12,16 @@ browser: true, devel: true, plusplus: true, unparam: true, todo: true, vars: tru
 // - continue in the same direction, until something obstructs the path
 // - if an obstruction is found, try next direction clockwise
 // - if no move is available, quit
-// 
+//
 
-require(["bower_components/refresher.js/refresher.js", "bower_components/underscore/underscore.js", "Grid2D", "Snake"], function(Refresher, _, Grid2D, Snake) {
+require.config({
+  paths: {
+      "underscore": "../bower_components/underscore/underscore",
+      "refresher" : "../bower_components/refresher.js/refresher"
+  }
+});
 
+require(["refresher", "underscore", "Grid2D", "Snake"], function(Refresher, _, Grid2D, Snake) {
 var refresh = new Refresher();
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
