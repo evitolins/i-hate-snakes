@@ -52,7 +52,7 @@ var Grid2D = function (w, h, defaultVal) {
       return grid;
     },
 
-    build = function (w ,h, defaultVal) {
+    build = function (w, h, defaultVal) {
       var arr = [];
       for (var i = h - 1; i >= 0; i--) {
         arr[i] = [];
@@ -61,12 +61,12 @@ var Grid2D = function (w, h, defaultVal) {
         }
       };
       return arr;
-    }; 
+    };
 
     // Build a grid w x h, using default value;
     w = w || 1;
     h = h || 1;
-    defaultVal = defaultVal || undefined;
+    defaultVal = defaultVal;
     grid = build(w, h, defaultVal);
 
     return {
