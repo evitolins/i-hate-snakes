@@ -22,6 +22,7 @@ require.config({
 });
 
 require(["refresher", "underscore", "Grid2D", "Snake"], function(Refresher, _, Grid2D, Snake) {
+'use strict';
 var refresh = new Refresher();
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
@@ -29,12 +30,11 @@ var pixel = 30;
 
 // Defaults
 var tailMaxLength = 4;
-var freq = 2000;
+var freq = 1;
 var width = 10;
 var height = 10;
 var grid = new Grid2D(width, height, 0);
 var snake = new Snake();
-var snaketail = [];
 
 var dirs = [
   [0,-1], //n
@@ -56,29 +56,42 @@ var colorArrayToRGBA = function (rgba) {
   return 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+rgba[3]+')';
 };
 
+// Combines grid and snake to evaluate collisions
+var gridCombined = function () {
+  var gridCopy = _.map(grid.getGrid(), _.clone);
+  var snakeVals = snake.getSnake();
+  var pos, i;
+  for (i=0; i<snakeVals.length; i++) {
+    pos = snakeVals[i];
+    gridCopy[pos[1]][pos[0]] = 4;
+  }
+  return gridCopy;
+};
 
 // Validate Proposed X & Y coords
 var getValidDirs = function (x, y){
   var xMax = width;
   var yMax = height;
   var dirs = [];
+  var gridC = gridCombined();
+
   // Validate N
-  if (y-1 >= 0 && grid.getCell(x, y-1) === 0) {
+  if (y-1 >= 0 && gridC[y-1][x] === 0) {
     dirs.push(0);
   }
   // Validate E
-  if (x+1 < xMax && grid.getCell(x+1,y) === 0) {
+  if (x+1 < xMax && gridC[y][x+1] === 0) {
     dirs.push(1);
   }
   // Validate S
-  if (y+1 < yMax && grid.getCell(x,y+1) === 0) {
+  if (y+1 < yMax && gridC[y+1][x] === 0) {
     dirs.push(2);
   }
   // Validate W
-  if (x-1 >= 0 && grid.getCell(x-1,y) === 0) {
+  if (x-1 >= 0 && gridC[y][x-1] === 0) {
     dirs.push(3);
   }
-  console.log("dirs", dirs);
+
   return dirs;
 };
 
@@ -116,23 +129,22 @@ var resetPosition = function (pos) {
 };
 
 // This example randomly chooses direction per choice
-var snake_run = function (position, direction, random) {
-  var pos = position;
+var snake_run = function (direction, random) {
   var dir = direction;
-  var v,i;
   var tries = 10000;
   var lastdir = dir;
-  
-  var x = pos[0];
-  var y = pos[1];
-  var validDirs = getValidDirs(x, y);
+  var v, i, pos, x, y, validDirs;  
+
+  x = snake.getSnake()[0][0];
+  y = snake.getSnake()[0][1];
+  validDirs = getValidDirs(x, y);
 
   i = 0;
   var step = function () {
-    x = pos[0];
-    y = pos[1];
+    x = snake.getSnake()[0][0];
+    y = snake.getSnake()[0][1];
     validDirs = getValidDirs(x, y);
-    
+
     // Quit
     if (!validDirs.length){
       return;
@@ -147,22 +159,9 @@ var snake_run = function (position, direction, random) {
     }
     lastdir = dir;
 
-    pos = [
-      x + dirs[dir][0],
-      y + dirs[dir][1]
-    ];
-
-    console.log('pos', x, y, 'pos2', pos[0], pos[1]);
-
     // Limit Tail Length
-    snaketail.unshift(pos);
-    if (snaketail.length > tailMaxLength) {
-      resetPosition(snaketail.pop());
-    }
-    
-    grid.setCell(pos[1], pos[0], 4);
-    
-    render(grid.getGrid());
+    snake.move(dirs[dir][0], dirs[dir][1]);  
+    render(gridCombined());
     i++;
   };
   
@@ -196,10 +195,9 @@ var init = function () {
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,1]
     ]);
-  snaketail = [];
-
-  render(grid.getGrid());
-  snake_run([randomX,randomY], 0, false);
+  snake.init(randomX, randomY, tailMaxLength);
+  render(gridCombined());
+  snake_run(0, false);
 };
 
 
