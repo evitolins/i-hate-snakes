@@ -1,33 +1,46 @@
 // Snake Object
 // - Snake object starts as a single point, and extends as it moves
 // - Collisions are handled externally
-var Snake = function (x, y, length) {
-  var len, snake,
+var Snake = function (x, y, maxLength) {
+  var maxLen, snake,
 
       move = function (x, y) {
         var newX = snake[0][0] + x,
             newY = snake[0][1] + y;
         snake.unshift([newX, newY]);
-        if (snake.length > len) {
-          snake.pop();
-        }
+        snake = snake.slice(0, maxLen);
       },
 
       getSnake = function () {
         return snake;
       },
 
-      init = function (x, y, length) {
-        len = length || 1;
-        snake = [[x, y]];
+      setSnake = function (array) {
+        snake = array.slice(0, maxLen) || [];
+      },
+
+      getMaxLength = function (int) {
+        return maxLen;
+      },
+
+      setMaxLength = function (int) {
+        maxLen = int || 1;
+      },
+
+      init = function (x, y, maxLength) {
+        setSnake([[x,y]]);
+        setMaxLength(maxLength);
       };
 
-      init(x, y, length);
+      init(x, y, maxLength);
 
       return {
-        init : init,
         move : move,
-        getSnake : getSnake
+        getSnake : getSnake,
+        setSnake : setSnake,
+        getMaxLength : getMaxLength,
+        setMaxLength : setMaxLength,
+        init : init
       };
 };
 
