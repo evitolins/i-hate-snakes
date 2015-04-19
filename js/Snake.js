@@ -1,7 +1,8 @@
 // Snake Object
+// - Snake object starts as a single point, and extends as it moves
+// - Collisions are handled externally
 var Snake = function (x, y, length) {
-  var len = length || 1,
-      snake = [[x, y]],
+  var len, snake,
 
       move = function (x, y) {
         var newX = snake[0][0] + x,
@@ -14,9 +15,17 @@ var Snake = function (x, y, length) {
 
       getSnake = function () {
         return snake;
+      },
+
+      init = function (x, y, length) {
+        len = length || 1;
+        snake = [[x, y]];
       };
 
+      init(x, y, length);
+
       return {
+        init : init,
         move : move,
         getSnake : getSnake
       };
