@@ -78,6 +78,9 @@ var Grid2D = function (w, h, defaultVal) {
 };
 
 // RequireJS Support
-define(function () {
+if (typeof define === 'function' && define.amd) {
+  define(function() {
     return Grid2D;
-});
+  });
+}
+

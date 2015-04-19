@@ -23,6 +23,8 @@ var Snake = function (x, y, length) {
 };
 
 // RequireJS Support
-define(function () {
+if (typeof define === 'function' && define.amd) {
+  define(function() {
     return Snake;
-});
+  });
+}
