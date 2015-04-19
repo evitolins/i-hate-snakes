@@ -14,7 +14,7 @@ browser: true, devel: true, plusplus: true, unparam: true, todo: true, vars: tru
 // - if no move is available, quit
 // 
 
-require(["bower_components/refresher.js/refresher.js", "Grid2D", "Snake"], function(Refresher, Grid2D, Snake) {
+require(["bower_components/refresher.js/refresher.js", "bower_components/underscore/underscore.js", "Grid2D", "Snake"], function(Refresher, _, Grid2D, Snake) {
 
 var refresh = new Refresher();
 var canvas = document.getElementById('canvas');
@@ -30,7 +30,7 @@ var grid = new Grid2D(width, height, 0);
 var snake = new Snake();
 var snaketail = [];
 
-var dirs= [
+var dirs = [
   [0,-1], //n
   [1,0],  //e
   [0,1],  //s

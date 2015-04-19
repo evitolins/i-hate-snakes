@@ -22,6 +22,7 @@
   ],
   "dependencies": {
     "refresher.js": "~1.0.0",
-    "requirejs": "~2.1.17"
+    "requirejs": "~2.1.17",
+    "underscore": "~1.8.3"
   }
 }
