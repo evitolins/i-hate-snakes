@@ -181,6 +181,7 @@ var snake_run = function (direction, random) {
 
 
 var init = function () {
+  var dir = Math.floor(Math.random() * 3);
   var randomX = Math.floor(Math.random() * 10);
   var randomY = Math.floor(Math.random() * 10);
   grid.setGrid([
@@ -197,7 +198,7 @@ var init = function () {
     ]);
   snake.init(randomX, randomY, tailMaxLength);
   render(gridCombined());
-  snake_run(0, false);
+  snake_run(dir, false);
 };
 
 
