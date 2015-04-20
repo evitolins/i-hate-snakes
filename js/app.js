@@ -36,12 +36,7 @@ var height = 10;
 var grid = new Grid2D(width, height, 0);
 var snake = new Snake();
 
-var dirs = [
-  [0,-1], //n
-  [1,0],  //e
-  [0,1],  //s
-  [-1,0]  //w
-];
+
 
 // Colors provided as rgba arrays (for easy manipulation)
 var colorPalette = {
@@ -68,33 +63,41 @@ var gridCombined = function () {
   return gridCopy;
 };
 
+// Vectors stored separately to easily check if they are valid choices
+var vectorTable = [
+  [0,-1], //n
+  [1,0],  //e
+  [0,1],  //s
+  [-1,0]  //w
+];
+
 // Validate Proposed X & Y coords
-var getValidDirs = function (x, y){
+var getValidVectors = function (x, y){
   var xMax = width;
   var yMax = height;
-  var dirs = [];
+  var vectors = [];
   var gridC = gridCombined();
 
   // Validate N
   if (y-1 >= 0 && gridC[y-1][x] === 0) {
-    dirs.push(0);
+    vectors.push(0);
   }
   // Validate E
   if (x+1 < xMax && gridC[y][x+1] === 0) {
-    dirs.push(1);
+    vectors.push(1);
   }
   // Validate S
   if (y+1 < yMax && gridC[y+1][x] === 0) {
-    dirs.push(2);
+    vectors.push(2);
   }
   // Validate W
   if (x-1 >= 0 && gridC[y][x-1] === 0) {
-    dirs.push(3);
+    vectors.push(3);
   }
 
-  return dirs;
+  return vectors;
 };
-
+  
 //Canvas Renderer
 var clear = function () {
   context.clearRect ( 0 , 0 , canvas.width , canvas.height );
@@ -122,38 +125,38 @@ var render = function (pixels) {
 
 
 // This example randomly chooses direction per choice
-var snake_run = function (direction, random) {
-  var dir = direction;
+var snake_run = function (vectorId, random) {
+  var vid = vectorId;
   var tries = 10000;
-  var lastdir = dir;
+  var lvid = vid;
   var v, i, pos, x, y, validDirs;  
 
   x = snake.getSnake()[0][0];
   y = snake.getSnake()[0][1];
-  validDirs = getValidDirs(x, y);
+  validDirs = getValidVectors(x, y);
 
   i = 0;
   var step = function () {
     x = snake.getSnake()[0][0];
     y = snake.getSnake()[0][1];
-    validDirs = getValidDirs(x, y);
+    validDirs = getValidVectors(x, y);
 
     // Quit
     if (!validDirs.length){
       return;
     }
     // Maintain course
-    if (validDirs.indexOf(lastdir) >= 0 && !random) {
-      dir = lastdir;
+    if (validDirs.indexOf(lvid) >= 0 && !random) {
+      vid = lvid;
     }
     // Choose new direction
     else {
-      dir = validDirs[Math.floor(Math.random() * validDirs.length)];
+      vid = validDirs[Math.floor(Math.random() * validDirs.length)];
     }
-    lastdir = dir;
+    lvid = vid;
 
     // Limit Tail Length
-    snake.move(dirs[dir][0], dirs[dir][1]);
+    snake.move(vectorTable[vid][0], vectorTable[vid][1]);
     clear();
     render(gridCombined());
     i++;
@@ -175,11 +178,11 @@ var snake_run = function (direction, random) {
 
 
 var init = function () {
-  var dir = Math.floor(Math.random() * 3);
+  var vectorId = Math.floor(Math.random() * 3);
   var randomX = Math.floor(Math.random() * 10);
   var randomY = Math.floor(Math.random() * 10);
   grid.setGrid([
-      [4,0,0,3,0,0,0,0,0,0],
+      [2,0,0,3,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
       [0,0,0,1,0,0,0,2,0,0],
       [0,0,0,0,0,0,0,0,0,3],
@@ -187,13 +190,13 @@ var init = function () {
       [0,0,0,2,0,0,0,0,0,0],
       [0,1,0,0,0,0,0,0,0,0],
       [0,0,0,0,3,0,0,0,0,0],
-      [1,0,0,0,0,0,0,0,0,0],
-      [1,0,0,0,0,0,0,0,0,1]
+      [1,0,0,0,0,0,0,0,1,0],
+      [1,0,0,0,0,0,0,0,0,0]
     ]);
   snake.init(randomX, randomY, tailMaxLength);
   clear();
   render(gridCombined());
-  snake_run(dir, false);
+  snake_run(vectorId, false);
 };
 
 var setMaxLength = function (val) {
