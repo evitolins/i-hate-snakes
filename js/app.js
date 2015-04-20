@@ -96,13 +96,12 @@ var getValidDirs = function (x, y){
 };
 
 //Canvas Renderer
-var clear = function() {
+var clear = function () {
   context.clearRect ( 0 , 0 , canvas.width , canvas.height );
 };
 
 var render = function (pixels) {
   var x,y,i,ii,rgba;
-  clear();
   for (i=0; i<pixels.length; i++) {
     for (ii=0; ii<pixels[i].length; ii++) {
       x = ii * pixel;
@@ -154,7 +153,8 @@ var snake_run = function (direction, random) {
     lastdir = dir;
 
     // Limit Tail Length
-    snake.move(dirs[dir][0], dirs[dir][1]);  
+    snake.move(dirs[dir][0], dirs[dir][1]);
+    clear();
     render(gridCombined());
     i++;
   };
@@ -191,6 +191,7 @@ var init = function () {
       [0,0,0,0,0,0,0,0,0,1]
     ]);
   snake.init(randomX, randomY, tailMaxLength);
+  clear();
   render(gridCombined());
   snake_run(dir, false);
 };
