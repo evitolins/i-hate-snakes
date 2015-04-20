@@ -122,12 +122,6 @@ var render = function (pixels) {
 };
 
 
-var resetPosition = function (pos) {
-  if (Object.prototype.toString.call( pos ) !== '[object Array]' ) return;
-  //Reset given position
-  grid.setCell(pos[1], pos[0], 0);
-};
-
 // This example randomly chooses direction per choice
 var snake_run = function (direction, random) {
   var dir = direction;
