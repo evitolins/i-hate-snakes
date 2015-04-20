@@ -25,6 +25,7 @@ var Snake = function (x, y, maxLength) {
 
       setMaxLength = function (int) {
         maxLen = int || 1;
+        snake = snake.slice(0, maxLen);
       },
 
       init = function (x, y, maxLength) {
