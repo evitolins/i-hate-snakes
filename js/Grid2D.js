@@ -44,6 +44,40 @@ var Grid2D = function (w, h, defaultVal) {
       return grid[y][x];
     },
 
+    getRow = function (y) {
+      return grid[y];
+    },
+
+    getColumn = function (x) {
+      var column=[],
+          i;
+      for (i=0; i<grid.length; i++) {
+        column.push(grid[i][x]);
+      }
+      return column;
+    },
+
+    // Pretty basic, need a more robust version
+    getNeighbors = function (x, y) {
+      x = x || 0;
+      y = y || 0;
+
+      var n = getCell(x, y-1),
+          ne = getCell(x+1, y-1),
+          e = getCell(x+1, y),
+          se = getCell(x+1, y+1),
+          s = getCell(x, y+1),
+          sw = getCell(x-1,y+1),
+          w = getCell(x-1, y),
+          nw = getCell(x-1, y-1);
+
+      return [
+         [nw, n, ne],
+         [w, [x,y], e],
+         [sw, s, se]
+        ];
+    },
+
     setGrid = function (array) {
       grid = array;
     },
@@ -73,7 +107,10 @@ var Grid2D = function (w, h, defaultVal) {
       setCell : setCell,
       getCell : getCell,
       setGrid : setGrid,
-      getGrid : getGrid
+      getGrid : getGrid,
+      getRow  : getRow,
+      getColumn : getColumn,
+      getNeighbors : getNeighbors
     };
 };
 
