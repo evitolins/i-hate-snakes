@@ -196,6 +196,16 @@ var init = function () {
   snake_run(dir, false);
 };
 
+var setMaxLength = function (val) {
+  tailMaxLength = val;
+  snake.setMaxLength(val);
+};
+var setFreq = function (val) {
+  freq = val;
+  refresh.setFreq(val);
+};
+
+
 
 // Bind Button
 var btn = document.getElementById('play');
@@ -206,9 +216,9 @@ var btn2 = document.getElementById('reset');
 btn2.addEventListener('click', function(){init();});
 
 var input_tail = document.getElementById('tail');
-input_tail.addEventListener('change', function(){snake.setMaxLength(parseInt(this.value, 10));});
+input_tail.addEventListener('change', function(){setMaxLength(parseInt(this.value, 10));});
 var input_freq = document.getElementById('freq');
-input_freq.addEventListener('change', function(){refresh.setFreq(parseInt(this.value, 10));});
+input_freq.addEventListener('change', function(){setFreq(parseInt(this.value, 10));});
 
 init();
 
