@@ -121,6 +121,27 @@ var render = function (pixels) {
   }
 };
 
+var renderSnake = function (snakeArray) {
+  var i, x, y, rgba;
+  rgba = colorPalette[4];
+
+  x = (snakeArray[0][0] * pixel) + 1 + pixel/2;
+  y = (snakeArray[0][1] * pixel) + 1 + pixel/2;
+
+  context.beginPath();
+  context.moveTo(x,y);
+  for (i = 1; i < snakeArray.length; i++) {
+    x = (snakeArray[i][0] * pixel) + 1 + pixel/2;
+    y = (snakeArray[i][1] * pixel) + 1 + pixel/2;
+    context.lineTo(x,y);
+  }
+  context.lineWidth = pixel - 2;
+  context.strokeStyle = colorArrayToRGBA(rgba);
+  context.lineJoin = 'round';
+  context.lineCap = 'round';
+  context.stroke();
+};
+
 
 // This example randomly chooses direction per choice
 var snake_run = function (vector, random) {
@@ -156,7 +177,8 @@ var snake_run = function (vector, random) {
     // Limit Tail Length
     snake.move(v[0], v[1]);
     clear();
-    render(gridCombined());
+    render(grid.getGrid());
+    renderSnake(snake.getSnake());
     i++;
   };
   
@@ -193,7 +215,8 @@ var init = function () {
     ]);
   snake.init(randomX, randomY, tailMaxLength);
   clear();
-  render(gridCombined());
+  render(grid.getGrid());
+  renderSnake(snake.getSnake());
   snake_run(vector, false);
 };
 
