@@ -80,19 +80,19 @@ var getValidVectors = function (x, y){
 
   // Validate N
   if (y-1 >= 0 && gridC[y-1][x] === 0) {
-    vectors.push(0);
+    vectors.push(vectorTable[0]);
   }
   // Validate E
   if (x+1 < xMax && gridC[y][x+1] === 0) {
-    vectors.push(1);
+    vectors.push(vectorTable[1]);
   }
   // Validate S
   if (y+1 < yMax && gridC[y+1][x] === 0) {
-    vectors.push(2);
+    vectors.push(vectorTable[2]);
   }
   // Validate W
   if (x-1 >= 0 && gridC[y][x-1] === 0) {
-    vectors.push(3);
+    vectors.push(vectorTable[3]);
   }
 
   return vectors;
@@ -125,10 +125,10 @@ var render = function (pixels) {
 
 
 // This example randomly chooses direction per choice
-var snake_run = function (vectorId, random) {
-  var vid = vectorId;
+var snake_run = function (vector, random) {
+  var v = vector;
   var tries = 10000;
-  var lvid = vid;
+  var lv = v;
   var v, i, pos, x, y, validDirs;  
 
   x = snake.getSnake()[0][0];
@@ -146,17 +146,17 @@ var snake_run = function (vectorId, random) {
       return;
     }
     // Maintain course
-    if (validDirs.indexOf(lvid) >= 0 && !random) {
-      vid = lvid;
+    if (validDirs.indexOf(lv) > -1 && !random) {
+      v = lv;
     }
     // Choose new direction
     else {
-      vid = validDirs[Math.floor(Math.random() * validDirs.length)];
+      v = validDirs[Math.floor(Math.random() * validDirs.length)];
     }
-    lvid = vid;
+    lv = v;
 
     // Limit Tail Length
-    snake.move(vectorTable[vid][0], vectorTable[vid][1]);
+    snake.move(v[0], v[1]);
     clear();
     render(gridCombined());
     i++;
@@ -167,6 +167,7 @@ var snake_run = function (vectorId, random) {
       step();
     } else {
       console.log("finished");
+      alert("finished");  
       refresh.stop();
     }
   };
@@ -178,7 +179,7 @@ var snake_run = function (vectorId, random) {
 
 
 var init = function () {
-  var vectorId = Math.floor(Math.random() * 3);
+  var vector = vectorTable[Math.floor(Math.random() * 3)];
   var randomX = Math.floor(Math.random() * 10);
   var randomY = Math.floor(Math.random() * 10);
   grid.setGrid([
@@ -196,7 +197,7 @@ var init = function () {
   snake.init(randomX, randomY, tailMaxLength);
   clear();
   render(gridCombined());
-  snake_run(vectorId, false);
+  snake_run(vector, false);
 };
 
 var setMaxLength = function (val) {
