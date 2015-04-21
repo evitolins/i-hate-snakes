@@ -78,23 +78,21 @@ var getValidVectors = function (x, y){
   var vectors = [];
   var gridC = gridCombined();
 
-  // Validate N
-  if (y-1 >= 0 && gridC[y-1][x] === 0) {
-    vectors.push(vectorTable[0]);
+  var vx, vy, i;
+  for (i=0; i<vectorTable.length; i++) {
+    vx = x + vectorTable[i][0];
+    vy = y + vectorTable[i][1];
+    if (vx < 0 || vx >= xMax) {
+      continue;
+    }
+    if (vy < 0 || vy >= yMax) {
+      continue;
+    }
+    if (gridC[vy][vx] !== 0) {
+      continue;
+    }
+    vectors.push(vectorTable[i]);
   }
-  // Validate E
-  if (x+1 < xMax && gridC[y][x+1] === 0) {
-    vectors.push(vectorTable[1]);
-  }
-  // Validate S
-  if (y+1 < yMax && gridC[y+1][x] === 0) {
-    vectors.push(vectorTable[2]);
-  }
-  // Validate W
-  if (x-1 >= 0 && gridC[y][x-1] === 0) {
-    vectors.push(vectorTable[3]);
-  }
-
   return vectors;
 };
   
