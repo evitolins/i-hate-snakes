@@ -26,16 +26,15 @@ require(["refresher", "underscore", "Grid2D", "Snake"], function(Refresher, _, G
 var refresh = new Refresher();
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
-var pixel = 30;
 
 // Defaults
+var pixel = 30;
 var tailMaxLength = 4;
 var freq = 1;
 var width = 10;
 var height = 10;
 var grid = new Grid2D(width, height, 0);
 var snake = new Snake();
-
 
 
 // Colors provided as rgba arrays (for easy manipulation)
@@ -121,6 +120,12 @@ var render = function (pixels) {
   }
 };
 
+var canvasSize = function () {
+  canvas.width = pixel * width;
+  canvas.height = pixel * height;
+};
+
+
 var renderSnake = function (snakeArray) {
   var i, x, y, rgba;
   rgba = colorPalette[4];
@@ -201,6 +206,9 @@ var init = function () {
   var vector = vectorTable[Math.floor(Math.random() * 3)];
   var randomX = Math.floor(Math.random() * 10);
   var randomY = Math.floor(Math.random() * 10);
+
+  canvasSize();
+
   grid.setGrid([
       [2,0,0,3,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0],
@@ -225,7 +233,8 @@ var ui = {
   btn_pause : document.getElementById('pause'),
   btn_reset : document.getElementById('reset'),
   range_tail : document.getElementById('tail'),
-  range_freq : document.getElementById('freq')
+  range_freq : document.getElementById('freq'),
+  range_pixel : document.getElementById('pixel')
 };
 
 var listeners = {
@@ -247,6 +256,14 @@ var listeners = {
     var val = parseInt(this.value, 10);
     freq = val;
     refresh.setFreq(val);
+  },
+  setPixel : function () {
+    var val = parseInt(this.value, 10);
+    pixel = val;
+    canvasSize();
+    clear();
+    render(grid.getGrid());
+    renderSnake(snake.getSnake());
   }
 };
 
@@ -258,6 +275,9 @@ ui.range_tail.addEventListener('change', listeners.setMaxLength);
 ui.range_tail.addEventListener('input', listeners.setMaxLength);
 ui.range_freq.addEventListener('change', listeners.setFreq);
 ui.range_freq.addEventListener('input', listeners.setFreq);
+
+ui.range_pixel.addEventListener('change', listeners.setPixel);
+ui.range_pixel.addEventListener('input', listeners.setPixel);
 
 init();
 
