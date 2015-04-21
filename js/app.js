@@ -164,9 +164,8 @@ var snake_run = function (vector, random) {
     if(i <= tries && validDirs.length){
       step();
     } else {
-      console.log("finished");
-      alert("finished");  
       refresh.stop();
+      console.log("finished");
     }
   };
   
@@ -198,29 +197,44 @@ var init = function () {
   snake_run(vector, false);
 };
 
-var setMaxLength = function (val) {
-  tailMaxLength = val;
-  snake.setMaxLength(val);
+var ui = {
+  btn_play : document.getElementById('play'),
+  btn_pause : document.getElementById('pause'),
+  btn_reset : document.getElementById('reset'),
+  range_tail : document.getElementById('tail'),
+  range_freq : document.getElementById('freq')
 };
-var setFreq = function (val) {
-  freq = val;
-  refresh.setFreq(val);
+
+var listeners = {
+  play : function () {
+    refresh.start();
+  },
+  pause : function () {
+    refresh.reset();
+  },
+  reset : function(){
+    init();
+  },
+  setMaxLength : function () {
+    var val = parseInt(this.value, 10);
+    tailMaxLength = val;
+    snake.setMaxLength(val);
+  },
+  setFreq : function () {
+    var val = parseInt(this.value, 10);
+    freq = val;
+    refresh.setFreq(val);
+  }
 };
 
-
-
-// Bind Button
-var btn = document.getElementById('play');
-btn.addEventListener('click', function(){refresh.start();});
-var btn1 = document.getElementById('pause');
-btn1.addEventListener('click', function(){refresh.reset();});
-var btn2 = document.getElementById('reset');
-btn2.addEventListener('click', function(){init();});
-
-var input_tail = document.getElementById('tail');
-input_tail.addEventListener('change', function(){setMaxLength(parseInt(this.value, 10));});
-var input_freq = document.getElementById('freq');
-input_freq.addEventListener('change', function(){setFreq(parseInt(this.value, 10));});
+// Bind UI
+ui.btn_play.addEventListener('click', listeners.play);
+ui.btn_pause.addEventListener('click', listeners.pause);
+ui.btn_reset.addEventListener('click', listeners.reset);
+ui.range_tail.addEventListener('change', listeners.setMaxLength);
+ui.range_tail.addEventListener('input', listeners.setMaxLength);
+ui.range_freq.addEventListener('change', listeners.setFreq);
+ui.range_freq.addEventListener('input', listeners.setFreq);
 
 init();
 

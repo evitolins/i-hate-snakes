@@ -12,20 +12,8 @@
   <button id="play">play</button>
   <button id="pause">pause</button>
   <button id="reset">reset</button>
-  <select id="tail">
-    <option value=1>1</option>
-    <option value=2>2</option>
-    <option value=4>4</option>
-    <option value=6>6</option>
-    <option value=8>8</option>
-    <option value=10>10</option>
-  </select>
-  <select id="freq">
-    <option value=1>1</option>
-    <option value=10>10</option>
-    <option value=100>100</option>
-    <option value=1000>1000</option>
-  </select>
+  <br><input id="tail" type="range" min=1 max=10 value=4> tail length
+  <br><input id="freq" type="range" min=1 max=1000 value=300> frequency
   <script src='bower_components/requirejs/require.js' data-main='js/app'></script>
 </body>
 </html>
