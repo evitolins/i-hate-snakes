@@ -28,14 +28,13 @@ var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 
 // Defaults
-var pixel = 30;
-var tailMaxLength = 4;
+var pixel = 15;
+var tailMaxLength = 20;
 var freq = 1;
-var width = 10;
-var height = 10;
+var width = 40;
+var height = 40;
 var grid = new Grid2D(width, height, 0);
 var snake = new Snake();
-
 
 // Colors provided as rgba arrays (for easy manipulation)
 var colorPalette = {
@@ -43,7 +42,8 @@ var colorPalette = {
   1 : [255, 0, 0, 1],
   2 : [0, 255, 0, 1],
   3 : [0, 0, 255, 1],
-  4 : [255, 0, 255, 1]
+  4 : [220, 220, 220, 0.4],
+  5 : [255, 255, 255, 1]
 };
 
 var colorArrayToRGBA = function (rgba) {
@@ -79,7 +79,6 @@ var getValidVectors = function (x, y, grid){
   var xMax = width;
   var yMax = height;
   var vectors = [];
-
   var vx, vy, i;
   for (i=0; i<vectorTable.length; i++) {
     vx = x + vectorTable[i][0];
@@ -130,12 +129,29 @@ var canvasSize = function () {
 
 
 var renderSnake = function (snakeArray) {
-  var i, x, y, rgba;
-  rgba = colorPalette[4];
+  var i, x, y, rgba_shadow, rgba_main;
+  rgba_shadow = colorPalette[4];
+  rgba_main = colorPalette[5];
 
+  // Shadow Line
   x = (snakeArray[0][0] * pixel) + 1 + pixel/2;
   y = (snakeArray[0][1] * pixel) + 1 + pixel/2;
+  context.beginPath();
+  context.moveTo(x,y);
+  for (i = 1; i < snakeArray.length; i++) {
+    x = (snakeArray[i][0] * pixel) + 1 + pixel/2;
+    y = (snakeArray[i][1] * pixel) + 1 + pixel/2;
+    context.lineTo(x,y);
+  }
+  context.lineWidth = pixel*6;
+  context.strokeStyle = colorArrayToRGBA(rgba_shadow);
+  context.lineJoin = 'round';
+  context.lineCap = 'round';
+  context.stroke();
 
+  // Main Line
+  x = (snakeArray[0][0] * pixel) + 1 + pixel/2;
+  y = (snakeArray[0][1] * pixel) + 1 + pixel/2;
   context.beginPath();
   context.moveTo(x,y);
   for (i = 1; i < snakeArray.length; i++) {
@@ -144,10 +160,11 @@ var renderSnake = function (snakeArray) {
     context.lineTo(x,y);
   }
   context.lineWidth = pixel - 2;
-  context.strokeStyle = colorArrayToRGBA(rgba);
+  context.strokeStyle = colorArrayToRGBA(rgba_main);
   context.lineJoin = 'round';
   context.lineCap = 'round';
   context.stroke();
+
 };
 
 
