@@ -71,11 +71,10 @@ var vectorTable = [
 ];
 
 // Validate Proposed X & Y coords
-var getValidVectors = function (x, y){
+var getValidVectors = function (x, y, grid){
   var xMax = width;
   var yMax = height;
   var vectors = [];
-  var gridC = gridCombined();
 
   var vx, vy, i;
   for (i=0; i<vectorTable.length; i++) {
@@ -87,7 +86,7 @@ var getValidVectors = function (x, y){
     if (vy < 0 || vy >= yMax) {
       continue;
     }
-    if (gridC[vy][vx] !== 0) {
+    if (grid[vy][vx] !== 0) {
       continue;
     }
     vectors.push(vectorTable[i]);
@@ -153,17 +152,20 @@ var snake_run = function (vector, random) {
   var v = vector;
   var tries = 10000;
   var lv = v;
-  var v, i, pos, x, y, validDirs;  
+  var v, i, pos, x, y, validDirs;
+  var selfCollide = false;
+
+  var collisionGridFunc = (selfCollide) ? gridCombined : grid.getGrid;
 
   x = snake.getSnake()[0][0];
   y = snake.getSnake()[0][1];
-  validDirs = getValidVectors(x, y);
+  validDirs = getValidVectors(x, y, collisionGridFunc());
 
   i = 0;
   var step = function () {
     x = snake.getSnake()[0][0];
     y = snake.getSnake()[0][1];
-    validDirs = getValidVectors(x, y);
+    validDirs = getValidVectors(x, y, collisionGridFunc());
 
     // Quit
     if (!validDirs.length){
