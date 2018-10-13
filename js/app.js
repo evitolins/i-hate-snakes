@@ -65,9 +65,13 @@ var gridCombined = function () {
 // Vectors stored separately to easily check if they are valid choices
 var vectorTable = [
   [0,-1], //n
+  [1,-1], //ne
   [1,0],  //e
+  [1,1],  //se
   [0,1],  //s
-  [-1,0]  //w
+  [-1,1], //sw
+  [-1,0], //w
+  [-1,-1] //nw
 ];
 
 // Validate Proposed X & Y coords
