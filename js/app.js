@@ -157,19 +157,18 @@ var snake_run = function (vector, random) {
   var tries = 10000;
   var lv = v;
   var v, i, pos, x, y, validDirs;
+  var x = snake.getSnake()[0][0];
+  var y = snake.getSnake()[0][1];
   var selfCollide = false;
-
-  var collisionGridFunc = (selfCollide) ? gridCombined : grid.getGrid;
-
-  x = snake.getSnake()[0][0];
-  y = snake.getSnake()[0][1];
-  validDirs = getValidVectors(x, y, collisionGridFunc());
+  var g = (selfCollide) ? gridCombined() : grid.getGrid();
+  var validDirs = getValidVectors(x, y, g);
 
   i = 0;
   var step = function () {
     x = snake.getSnake()[0][0];
     y = snake.getSnake()[0][1];
-    validDirs = getValidVectors(x, y, collisionGridFunc());
+    g = (selfCollide) ? gridCombined() : grid.getGrid();
+    validDirs = getValidVectors(x, y, g);
 
     // Quit
     if (!validDirs.length){
