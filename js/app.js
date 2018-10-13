@@ -21,7 +21,7 @@ require.config({
   }
 });
 
-require(["refresher", "underscore", "Grid2D", "Snake"], function(Refresher, _, Grid2D, Snake) {
+require(["refresher", "underscore", "Grid2D_prototype", "Snake"], function(Refresher, _, Grid2D, Snake) {
 'use strict';
 var refresh = new Refresher();
 var canvas = document.getElementById('canvas');
