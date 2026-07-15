@@ -1,2 +1,3 @@
 # i-hate-snakes
-Experiments with HTML5 canvas, based on the classic snake game
+
+[Random doodle](https://evitolins.github.io/i-hate-snakes/) using a HTML5 canvas, loosely based on the classic snake game

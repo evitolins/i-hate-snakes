@@ -28,7 +28,7 @@ var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 
 // Defaults
-var pixel = 15;
+var pixel = 36;
 var tailMaxLength = 20;
 var freq = 1;
 var width = 15;
