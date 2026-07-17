@@ -33,10 +33,18 @@ var tailMaxLength = 20;
 var freq = 1;
 var width = 15;
 var height = 15;
+var numSnakes = 3;
 var grid = new Grid2D(width, height, 0);
-var snake = new Snake();
+var snakes = [];
 var isRandom = true;
 var isSelfCollide = false;
+var isPlaying = true;
+var isHideDots = false;
+var isHideSnakes = false;
+
+// Snapshot of grid + snake start positions/vectors, captured on regenerate so
+// "reset" can rewind to it instead of randomizing again
+var initialState = null;
 
 // Colors provided as rgba arrays (for easy manipulation)
 var colorPalettes = [
@@ -73,14 +81,29 @@ var colorArrayToRGBA = function (rgba) {
   return 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+','+rgba[3]+')';
 };
 
-// Combines grid and snake to evaluate collisions
+// Biased away from the extremes so every snake stays visible against the dark canvas
+var randomColor = function () {
+  return [
+    60 + Math.floor(Math.random() * 180),
+    60 + Math.floor(Math.random() * 180),
+    60 + Math.floor(Math.random() * 180)
+  ];
+};
+
+var cloneGrid = function (gridData) {
+  return _.map(gridData, function (row) { return row.slice(); });
+};
+
+// Combines grid and all snake bodies to evaluate collisions
 var gridCombined = function () {
   var gridCopy = _.map(grid.getGrid(), _.clone);
-  var snakeVals = snake.getSnake();
-  var pos, i;
-  for (i=0; i<snakeVals.length; i++) {
-    pos = snakeVals[i];
-    gridCopy[pos[1]][pos[0]] = 4;
+  var snakeVals, pos, s, i;
+  for (s=0; s<snakes.length; s++) {
+    snakeVals = snakes[s].instance.getSnake();
+    for (i=0; i<snakeVals.length; i++) {
+      pos = snakeVals[i];
+      gridCopy[pos[1]][pos[0]] = 4;
+    }
   }
   return gridCopy;
 };
@@ -152,10 +175,11 @@ var canvasSize = function () {
 };
 
 
-var renderSnake = function (snakeArray) {
-  var i, x, y, rgba_shadow, rgba_main;
-  rgba_shadow = colorPalette[5]; rgba_shadow[3] = 0.2;
-  rgba_main = colorPalette[0]; rgba_main[3] = 0.8;
+var renderSnake = function (snakeArray, color) {
+  var i, x, y, rgba_shadow, rgba_main, rgba_head;
+  rgba_shadow = [255, 255, 255, 0.2];
+  rgba_main = [color[0], color[1], color[2], 0.85];
+  rgba_head = [color[0], color[1], color[2], 0.95];
 
   // Shadow Line
   x = (snakeArray[0][0] * pixel) + 1 + pixel/2;
@@ -193,7 +217,7 @@ var renderSnake = function (snakeArray) {
   x = (snakeArray[0][0] * pixel) + 1 - pixel/2;
   y = (snakeArray[0][1] * pixel) + 1 - pixel/2;
   context.beginPath();
-  context.fillStyle = "#ff0000aa";
+  context.fillStyle = colorArrayToRGBA(rgba_head);
   context.arc(x+(pixel), y+(pixel), (pixel/2), 0, 2 * Math.PI, false);
   context.fill();
 };
@@ -253,78 +277,128 @@ var reflect_vector = function (vector, validDirs) {
   return validDirs[Math.floor(Math.random() * validDirs.length)];
 };
 
-// This example randomly chooses direction per choice
-var snake_run = function (vector, random) {
-  var v = vector;
-  var tries = 10000;
-  var lv = v;
-  var v, i, pos, x, y, validDirs;
-  var x = snake.getSnake()[0][0];
-  var y = snake.getSnake()[0][1];
+// Advances a single snake by one step, choosing a new direction when blocked
+var stepSnake = function (snk) {
+  var head = snk.instance.getSnake()[0];
+  var x = head[0];
+  var y = head[1];
   var g = (isSelfCollide) ? gridCombined() : grid.getGrid();
   var validDirs = getValidVectors(x, y, g);
+  var v, collide_x, collide_y, val;
 
-  i = 0;
+  // Quit
+  if (!validDirs.length) {
+    snk.alive = false;
+    return;
+  }
+
+  // Maintain course
+  if (validDirs.indexOf(snk.lv) > -1) {
+    v = snk.lv;
+  }
+  // Choose new direction
+  else {
+    collide_x = x + snk.lv[0];
+    collide_y = y + snk.lv[1];
+    if (collide_x >= 0 && collide_x < grid.w && collide_y >= 0 && collide_y < grid.h) {
+      val = grid.getCell(collide_x, collide_y);
+      if (val) {
+        grid.setCell(collide_x, collide_y, val-1);
+      }
+    }
+    if (isRandom) {
+      v = validDirs[Math.floor(Math.random() * validDirs.length)];
+    } else {
+      v = reflect_vector(snk.lv, validDirs);
+    }
+  }
+  snk.lv = v;
+  snk.instance.move(v[0], v[1]);
+};
+
+// Steps every snake once per tick, stopping once none can move
+var snake_run = function () {
+  var tries = 10000;
+  var i = 0;
+  var running = true;
+
   var step = function () {
-    x = snake.getSnake()[0][0];
-    y = snake.getSnake()[0][1];
-    g = (isSelfCollide) ? gridCombined() : grid.getGrid();
-    validDirs = getValidVectors(x, y, g);
-
-    // Quit
-    if (!validDirs.length){
-      return;
-    }
-    // Maintain course
-    if (validDirs.indexOf(lv) > -1 && !random) {
-      v = lv;
-    }
-    // Choose new direction
-    else {
-      var collide_x = x + lv[0]; 
-      var collide_y = y + lv[1];
-      if (collide_x >= 0 && collide_x < grid.w && collide_y >= 0 && collide_y < grid.h) {
-        var val = grid.getCell(collide_x, collide_y);
-        if (val) {
-          grid.setCell(collide_x, collide_y, val-1);
-        }
+    var s, anyAlive = false;
+    for (s=0; s<snakes.length; s++) {
+      if (!snakes[s].alive) {
+        continue;
       }
-      if (isRandom) {
-        v = validDirs[Math.floor(Math.random() * validDirs.length)];
-      } else {
-        v = reflect_vector(lv, validDirs);
+      stepSnake(snakes[s]);
+      if (snakes[s].alive) {
+        anyAlive = true;
       }
     }
-    lv = v;
-
-    // Limit Tail Length
-    snake.move(v[0], v[1]);
-    clear();
-    render(grid.getGrid());
-    renderSnake(snake.getSnake());
+    renderAllSnakes();
     i++;
+    running = anyAlive;
   };
-  
+
   var next = function () {
-    if(i <= tries && validDirs.length){
+    if (i <= tries && running) {
       step();
     } else {
       refresh.stop();
       console.log("finished");
     }
   };
-  
+
   refresh.setFreq(freq);
   refresh.setCallback(next);
   refresh.start();
 };
 
+// Builds numSnakes fresh Snake instances at non-overlapping (best-effort) start cells
+var createSnakes = function () {
+  var used = {};
+  var n, rx, ry, key, attempts, inst;
 
-var init = function () {
-  var vector = vectorTable[Math.floor(Math.random() * 3)];
-  var randomX = Math.floor(Math.random() * 10);
-  var randomY = Math.floor(Math.random() * 10);
+  snakes = [];
+  for (n=0; n<numSnakes; n++) {
+    attempts = 100;
+    do {
+      rx = Math.floor(Math.random() * width);
+      ry = Math.floor(Math.random() * height);
+      key = rx + ',' + ry;
+      attempts--;
+    } while (used[key] && attempts > 0);
+    used[key] = true;
 
+    inst = new Snake();
+    inst.init(rx, ry, tailMaxLength);
+
+    snakes.push({
+      instance: inst,
+      lv: vectorTable[Math.floor(Math.random() * vectorTable.length)],
+      color: randomColor(),
+      alive: true
+    });
+  }
+};
+
+// Snapshots the current grid + each snake's start position/vector/color, so
+// "reset" can rewind to this exact layout instead of randomizing again
+var captureInitialState = function () {
+  initialState = {
+    gridData: cloneGrid(grid.getGrid()),
+    snakes: _.map(snakes, function (snk) {
+      var head = snk.instance.getSnake()[0];
+      return {
+        x: head[0],
+        y: head[1],
+        lv: snk.lv,
+        color: snk.color
+      };
+    })
+  };
+};
+
+// Rebuilds a brand new random grid + snake set (new dots, new snakes)
+var regenerate = function () {
   canvasSize();
 
   // grid.setGrid([
@@ -347,40 +421,102 @@ var init = function () {
   for (var i=0; i<20; i++) { grid.setCellRandom(3); }
   for (var i=0; i<10; i++) { grid.setCellRandom(2); }
 
-  snake.init(randomX, randomY, tailMaxLength);
-  clear();
-  render(grid.getGrid());
-  renderSnake(snake.getSnake());
-  snake_run(vector, false);
+  createSnakes();
+  captureInitialState();
+  renderAllSnakes();
+  isPlaying = true;
+  ui.btn_playpause.textContent = 'pause';
+  snake_run();
+};
+
+// Rewinds to the last regenerated layout: same dots, same snake start
+// positions/vectors/colors, but honoring whatever the sliders are set to now
+var restart = function () {
+  var s, snap, inst;
+
+  if (!initialState) {
+    regenerate();
+    return;
+  }
+
+  canvasSize();
+  grid.setGrid(cloneGrid(initialState.gridData));
+
+  snakes = [];
+  for (s=0; s<initialState.snakes.length; s++) {
+    snap = initialState.snakes[s];
+    inst = new Snake();
+    inst.init(snap.x, snap.y, tailMaxLength);
+    snakes.push({
+      instance: inst,
+      lv: snap.lv,
+      color: snap.color,
+      alive: true
+    });
+  }
+
+  renderAllSnakes();
+  isPlaying = true;
+  ui.btn_playpause.textContent = 'pause';
+  snake_run();
 };
 
 var ui = {
-  btn_play : document.getElementById('play'),
-  btn_pause : document.getElementById('pause'),
+  btn_playpause : document.getElementById('playpause'),
   btn_reset : document.getElementById('reset'),
+  btn_regenerate : document.getElementById('regenerate'),
+  range_numsnakes : document.getElementById('numsnakes'),
   range_tail : document.getElementById('tail'),
   range_freq : document.getElementById('freq'),
   range_pixel : document.getElementById('pixel'),
   range_width : document.getElementById('width'),
   range_height : document.getElementById('height'),
   ckbx_random : document.getElementById('random'),
-  ckbx_self_collide : document.getElementById('selfcollide')
+  ckbx_self_collide : document.getElementById('selfcollide'),
+  ckbx_hide_dots : document.getElementById('hidedots'),
+  ckbx_hide_snakes : document.getElementById('hidesnakes')
+};
+
+var renderAllSnakes = function () {
+  clear();
+  if (!isHideDots) {
+    render(grid.getGrid());
+  }
+  if (!isHideSnakes) {
+    for (var s=0; s<snakes.length; s++) {
+      renderSnake(snakes[s].instance.getSnake(), snakes[s].color);
+    }
+  }
 };
 
 var listeners = {
-  play : function () {
-    refresh.start();
-  },
-  pause : function () {
-    refresh.reset();
+  togglePlay : function () {
+    if (isPlaying) {
+      refresh.reset();
+      isPlaying = false;
+    } else {
+      refresh.start();
+      isPlaying = true;
+    }
+    ui.btn_playpause.textContent = isPlaying ? 'pause' : 'play';
   },
   reset : function(){
-    init();
+    restart();
+  },
+  regenerate : function(){
+    regenerate();
+  },
+  setNumSnakes : function () {
+    var val = parseInt(this.value, 10);
+    numSnakes = val;
+    regenerate();
   },
   setMaxLength : function () {
     var val = parseInt(this.value, 10);
     tailMaxLength = val;
-    snake.setMaxLength(val);
+    for (var s=0; s<snakes.length; s++) {
+      snakes[s].instance.setMaxLength(val);
+    }
   },
   setFreq : function () {
     var val = parseInt(this.value, 10);
@@ -391,42 +527,42 @@ var listeners = {
     var val = parseInt(this.value, 10);
     pixel = val;
     canvasSize();
-    clear();
-    render(grid.getGrid());
-    renderSnake(snake.getSnake());
+    renderAllSnakes();
   },
   setWidth : function () {
     var val = parseInt(this.value, 10);
     width = val;
     canvasSize();
-    clear();
-    render(grid.getGrid());
-    renderSnake(snake.getSnake());
+    renderAllSnakes();
   },
   setHeight : function () {
     var val = parseInt(this.value, 10);
     height = val;
     canvasSize();
-    clear();
-    render(grid.getGrid());
-    renderSnake(snake.getSnake());
+    renderAllSnakes();
   },
   setRandom : function (e) {
-    console.log(e);
-    console.log(e.target.checked);
     isRandom = !!e.target.checked;
   },
   setSelfCollide : function (e) {
-    console.log(e);
-    console.log(e.target.checked);
     isSelfCollide = !!e.target.checked;
+  },
+  setHideDots : function (e) {
+    isHideDots = !!e.target.checked;
+    renderAllSnakes();
+  },
+  setHideSnakes : function (e) {
+    isHideSnakes = !!e.target.checked;
+    renderAllSnakes();
   }
 };
 
 // Bind UI
-ui.btn_play.addEventListener('click', listeners.play);
-ui.btn_pause.addEventListener('click', listeners.pause);
+ui.btn_playpause.addEventListener('click', listeners.togglePlay);
 ui.btn_reset.addEventListener('click', listeners.reset);
+ui.btn_regenerate.addEventListener('click', listeners.regenerate);
+ui.range_numsnakes.addEventListener('change', listeners.setNumSnakes);
+ui.range_numsnakes.addEventListener('input', listeners.setNumSnakes);
 ui.range_tail.addEventListener('change', listeners.setMaxLength);
 ui.range_tail.addEventListener('input', listeners.setMaxLength);
 ui.range_freq.addEventListener('change', listeners.setFreq);
@@ -441,7 +577,9 @@ ui.range_height.addEventListener('change', listeners.setHeight);
 ui.range_height.addEventListener('input', listeners.setHeight);
 
 ui.ckbx_random.addEventListener('click', listeners.setRandom);
-ui.ckbx_self_collide.addEventListener('click', listeners.setSelfCollide)
-init();
+ui.ckbx_self_collide.addEventListener('click', listeners.setSelfCollide);
+ui.ckbx_hide_dots.addEventListener('click', listeners.setHideDots);
+ui.ckbx_hide_snakes.addEventListener('click', listeners.setHideSnakes);
+regenerate();
 
 });

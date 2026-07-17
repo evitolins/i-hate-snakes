@@ -55,6 +55,17 @@ body {
   background: #333;
 }
 
+.button-row {
+  flex-direction: row;
+}
+
+.btn-large {
+  flex: 1;
+  padding: 14px 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .control-group label {
   font-size: 12px;
   color: #999;

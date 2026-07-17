@@ -11,17 +11,20 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <h1>random snake</h1>
+      <h1>random snake(s)</h1>
 
-      <div class="control-group">
-        <button id="play">play</button>
-        <button id="pause">pause</button>
-        <button id="reset">reset</button>
+      <div class="control-group button-row">
+        <button id="playpause" class="btn-large">pause</button>
+        <button id="reset" class="btn-large">reset</button>
+        <button id="regenerate" class="btn-large">new</button>
       </div>
 
       <div class="control-group">
+        <label for="numsnakes">snakes</label>
+        <input id="numsnakes" type="range" min=1 max=12 value=3>
+
         <label for="tail">tail length</label>
-        <input id="tail" type="range" min=1 max=200 value=4>
+        <input id="tail" type="range" min=1 max=200 value=20>
 
         <label for="freq">frequency</label>
         <input id="freq" type="range" min=1 max=1000 value=1>
@@ -37,6 +40,8 @@
 
         <label class="checkbox-label"><input id="random" type="checkbox" checked> random direction</label>
         <label class="checkbox-label"><input id="selfcollide" type="checkbox"> self-collision</label>
+        <label class="checkbox-label"><input id="hidedots" type="checkbox"> hide dots</label>
+        <label class="checkbox-label"><input id="hidesnakes" type="checkbox"> hide snakes</label>
       </div>
     </aside>
 
